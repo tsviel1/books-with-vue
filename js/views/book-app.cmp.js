@@ -1,5 +1,6 @@
 import { bookService } from "../services/book-service.js";
 import bookList from "../cmps/book-list.cmp.js";
+import bookAdd from "../cmps/book-add.cmp.js";
 import bookDetails from "../views/book-details.cmp.js";
 import bookFilter from "../cmps/book-filter-cmp.js";
 
@@ -9,6 +10,7 @@ export default {
     <section class="book-app">
         <h1>Books:</h1>
         <book-filter @filtered="onFilterBook"/>
+        <book-add @bookAdded="addBook"/>
         <book-list @selected="onSelectBook" :books="booksToDisplay" />
     </section>
 `,
@@ -31,6 +33,10 @@ export default {
         },
         onCloseDetails() {
             this.selectedBook = null
+        },
+        addBook(book) {
+            bookService.query()
+                .then(books => this.books = books)
         }
     },
     computed: {
@@ -44,5 +50,6 @@ export default {
         bookList,
         bookDetails,
         bookFilter,
+        bookAdd
     }
 };

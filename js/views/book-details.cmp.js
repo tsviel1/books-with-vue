@@ -8,7 +8,6 @@ export default {
         <button class="close">
             <router-link to="/book">Back</router-link>
         </button>
-        <!-- <button @click="$emit('close')" class="close">Back</button> -->
         <h4>Book Details</h4>
         <div class="all-details">
             <img class="book-img" :src="bookImgUrl" alt="">
@@ -44,12 +43,14 @@ export default {
             </div>
         </div>
     </section>
+    <router-link :to="'/book/' + nextBookId">Next Book</router-link>
     <review-add/>
 `,
     data() {
         return {
             saleImgUrl: '/imgs/sale.png',
-            book: null
+            book: null,
+            nextBookId: null
         };
     },
     computed: {
@@ -71,6 +72,7 @@ export default {
             else if (this.book.pageCount < 100) return 'Light Reading'
         },
         bookAge() {
+            if (!this.book.publishedDate) return
             if (this.book.publishedDate < 2012) return 'Veteran Book'
             else if (this.book.publishedDate > 2021) return 'New!'
         },
@@ -91,9 +93,20 @@ export default {
         bookDesc,
         reviewAdd
     },
-    created() {
-        const id = this.$route.params.bookId
-        bookService.get(id).then(book => this.book = book)
-    },
+    watch: {
+        '$route.params.bookId': {
+            handler() {
+                const id = this.$route.params.bookId
+                bookService.get(id)
+                    .then(book => {
+                        console.log('book', book)
+                        this.book = book
+                        bookService.getNextBookId(book.id)
+                            .then(nextBookId => this.nextBookId = nextBookId)
+                    })
+            },
+            immediate: true
+        },
+    }
 
 }
